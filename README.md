@@ -1,5 +1,5 @@
 # Horse websites
-[https://fast.sorry.horse](fast)
-[https://faster.sorry.horse](faster)
-[https://fastest.sorry.horse](fastest)
-[https://many.sorry.horse](co-op)
+[fast](https://fast.sorry.horse)
+[faster](https://faster.sorry.horse)
+[fastest](https://fastest.sorry.horse)
+[co-op](https://many.sorry.horse)
