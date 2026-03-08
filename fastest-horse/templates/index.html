@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head>
+<style>
+html, body {margin: 0; height: 100%; overflow: hidden; width:100vw }
+
+@keyframes slide-in {
+    100% { transform: translateX(calc(100vw + 200px)); }
+}
+</style>
+    </head><body style="display: flex;align-items: center;justify-content: center; width:100vw; overflow:hidden; height:100vh; position:relative">
+
+<img style="position: absolute; top: 0px; width: 100px; left: -100px;" src="https://www.gifanimate.com/data/media/217/cavallo-immagine-animata-0271.gif">
+  <button onclick="horse()">horse</button>
+</body></html>
+
+<script>
+    let horseCount = 0;
+    function sleep(ms) {
+	  return new Promise(resolve => setTimeout(resolve, ms));
+	}
+    async function _audio(speed, noise) {
+	const time = window.innerWidth / speed;
+	for(let i = 0; i < 100 * time; i++) {
+		try {
+		noise.volume -= 1 / (Math.floor(100 * time));
+		}
+		catch {}
+		await sleep(10);
+	}
+	noise.volume = 0;
+    }
+
+    async function horse() {
+	if (horseCount == 1) {
+		return;
+	}
+	horseCount = 1;
+        const horse = document.createElement("img");
+        horse.style.position = "absolute";
+        horse.style.top = Math.random() * (window.innerHeight - 100) + "px";
+        horse.src="https://www.gifanimate.com/data/media/217/cavallo-immagine-animata-0271.gif";
+        horse.style.width="100px";
+        horse.style.left = "-100px";
+	horse.style.userSelect = "none";
+        horse.className = "slide-in";
+        
+	let speed = 10000 + Math.random() * 100;
+	const fileNum = Math.ceil(Math.random() * 3);
+    	if (fileNum == 1) {
+		a = new Audio(`{{ url_for('static', filename='ah.mp3') }}`);
+	} 
+	if (fileNum == 2) {
+		a = new Audio(`{{ url_for('static', filename='ah2.mp3') }}`);
+	}
+	if (fileNum == 3) {
+		a = new Audio(`{{ url_for('static', filename='ah3.mp3') }}`);
+	}
+	a.play();
+	await sleep(300);
+        const duration = window.innerWidth / speed;
+        horse.style.animation = `slide-in ${duration}s forwards linear`;
+
+        document.body.appendChild(horse);
+	await sleep(200);
+	_audio(speed/4, a);
+    }
+
+
+</script>
+
