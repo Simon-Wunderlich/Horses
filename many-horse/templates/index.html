@@ -8,9 +8,9 @@ html, body {margin: 0; height: 100%; overflow: hidden; width:100vw }
 }
 </style>
     </head><body style="display: flex;align-items: center;justify-content: center; width:100vw; overflow:hidden; height:100vh; position:relative">
-
 <img style="position: absolute; top: 0px; width: 100px; left: -100px;" src="https://www.gifanimate.com/data/media/217/cavallo-immagine-animata-0271.gif">
   <button onclick="horse()">horse</button>
+	    <input type="color" id="colour" />
 </body></html>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
@@ -19,6 +19,7 @@ html, body {margin: 0; height: 100%; overflow: hidden; width:100vw }
     var socket = io();
     let horseCount = 0;
     let horseSounds = []
+    let colour = -1;
 
     function sleep(ms) {
 	  return new Promise(resolve => setTimeout(resolve, ms));
@@ -51,7 +52,7 @@ html, body {margin: 0; height: 100%; overflow: hidden; width:100vw }
 	}
     }
 
-    async function horse(speed = 0, top = -1) {
+    async function horse(speed = 0, top = -1, _colour = colour) {
         const horse = document.createElement("img");
         horse.style.position = "absolute";
 	if (top == -1) {
@@ -69,7 +70,7 @@ html, body {margin: 0; height: 100%; overflow: hidden; width:100vw }
 		if (Math.floor(Math.random() * 30) == 2) {
 			speed = 3000;
 		}
-		socket.send({ "speed" : speed, "uid" : uid, "top" : top});
+		socket.send({ "speed" : speed, "uid" : uid, "top" : top, "colour" : colour});
 	}
        if (speed == 3000) {
 		a = new Audio("{{ url_for('static', filename='cool.mp3') }}");
@@ -92,15 +93,49 @@ html, body {margin: 0; height: 100%; overflow: hidden; width:100vw }
 	    }
         const duration = window.innerWidth / speed;
         horse.style.animation = `slide-in ${duration}s forwards linear`;
+	if (_colour != -1){
+		horse.style.filter = `saturate(500%) brightness(100%) hue-rotate(${_colour}deg)`;
+	}
 
         document.body.appendChild(horse);
     }
 
     socket.on("horse", function(data) {
 	    if (data["uid"] != uid) {
-		horse(data["speed"], data["top"]);
+		horse(data["speed"], data["top"], data["colour"]);
 	    }
     });
+    let colourPicker = document.getElementById("colour");
+    colourPicker.addEventListener("input", function (event) {
+	   colour = hexToHue(event.target.value);
+    });
+ 
+    function hexToHue(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
+    let r = parseInt(result[1], 16);
+    let g = parseInt(result[2], 16);
+    let b = parseInt(result[3], 16);
+
+    r /= 255, g /= 255, b /= 255;
+    let max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = (max + min) / 2;
+
+    if (max == min){
+        h = 0; // achromatic
+    } else {
+        var d = max - min;
+        switch(max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+
+        h /= 6;
+    }
+
+    h = Math.round(h*360);
+    return h;
+}
 </script>
 
